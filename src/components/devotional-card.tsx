@@ -1,7 +1,13 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { dateFmt, getSortTime, imageUrl } from "@/lib/checkin";
 import type { CheckIn } from "@/types/devotional";
+import { useState } from "react";
 
 type DevotionalCardProps = {
 	checkIn: CheckIn;
@@ -10,20 +16,44 @@ type DevotionalCardProps = {
 export function DevotionalCard({ checkIn: c }: DevotionalCardProps) {
 	const img = imageUrl(c);
 	const when = dateFmt.format(new Date(getSortTime(c)));
+	const [imageOpen, setImageOpen] = useState(false);
 
 	return (
 		<Card className="overflow-hidden p-0 py-0 ring-1 ring-border">
-			<div className="flex flex-col sm:flex-row">
+			<div className="flex items-start gap-4 p-4">
 				{img ? (
-					<div className="aspect-video w-full shrink-0 sm:aspect-auto sm:h-auto sm:w-44 sm:self-stretch">
-						<img
-							src={img}
-							alt=""
-							className="h-full min-h-44 w-full object-cover sm:min-h-full"
-						/>
-					</div>
+					<>
+						<button
+							type="button"
+							onClick={() => setImageOpen(true)}
+							className="size-14 shrink-0 cursor-zoom-in overflow-hidden rounded-md ring-1 ring-border transition-opacity hover:opacity-80"
+						>
+							<img
+								src={img}
+								alt=""
+								className="size-full object-cover"
+							/>
+						</button>
+
+						<Dialog open={imageOpen} onOpenChange={setImageOpen}>
+							<DialogContent
+								className="max-w-[min(90vw,56rem)] p-2"
+								showCloseButton
+							>
+								<DialogTitle className="sr-only">
+									Imagem do devocional
+								</DialogTitle>
+								<img
+									src={img}
+									alt=""
+									className="max-h-[80vh] w-full rounded-lg object-contain"
+								/>
+							</DialogContent>
+						</Dialog>
+					</>
 				) : null}
-				<CardContent className="flex flex-1 flex-col gap-3 py-5">
+
+				<div className="flex min-w-0 flex-1 flex-col gap-3">
 					<time
 						dateTime={c.occurred_at}
 						className="text-xs font-medium tracking-wide text-muted-foreground uppercase"
@@ -41,7 +71,7 @@ export function DevotionalCard({ checkIn: c }: DevotionalCardProps) {
 							</p>
 						) : null}
 					</div>
-				</CardContent>
+				</div>
 			</div>
 		</Card>
 	);
