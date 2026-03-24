@@ -15,10 +15,13 @@ export default function App() {
 		setTitleQuery,
 		contentQuery,
 		setContentQuery,
+		deferredTitleQuery,
+		deferredContentQuery,
 		dateSortOrder,
 		setDateSortOrder,
 		sortedCheckIns,
 		filtered,
+		isPending,
 		orderLabel,
 	} = useDevotionalSearch(data.check_ins, filterRules);
 
@@ -42,7 +45,19 @@ export default function App() {
 					onSortChange={setDateSortOrder}
 				/>
 
-				<DevotionalList checkIns={filtered} />
+				<div
+					className={
+						isPending
+							? "opacity-60 transition-opacity duration-200"
+							: "transition-opacity duration-200"
+					}
+				>
+					<DevotionalList
+						checkIns={filtered}
+						titleQuery={deferredTitleQuery}
+						contentQuery={deferredContentQuery}
+					/>
+				</div>
 			</main>
 		</div>
 	);

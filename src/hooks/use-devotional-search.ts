@@ -1,5 +1,5 @@
 import Fuse from "fuse.js";
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { getSortTime } from "@/lib/checkin";
 import { applyFilterRules } from "@/lib/checkin-filters";
 import { normalizeSearchText } from "@/lib/normalize";
@@ -22,6 +22,9 @@ export function useDevotionalSearch(
 	const [titleQuery, setTitleQuery] = useState("");
 	const [contentQuery, setContentQuery] = useState("");
 	const [dateSortOrder, setDateSortOrder] = useState<DateSortOrder>("asc");
+
+	const deferredTitleQuery = useDeferredValue(titleQuery);
+	const deferredContentQuery = useDeferredValue(contentQuery);
 
 	const baseCheckIns = useMemo(
 		() => applyFilterRules(checkIns, rules),
@@ -53,8 +56,8 @@ export function useDevotionalSearch(
 
 	const filtered = useMemo(() => {
 		let list = sortedCheckIns;
-		const tq = normalizeSearchText(titleQuery);
-		const cq = normalizeSearchText(contentQuery);
+		const tq = normalizeSearchText(deferredTitleQuery);
+		const cq = normalizeSearchText(deferredContentQuery);
 		if (tq) {
 			const ids = new Set(fuseTitle.search(tq).map((r) => r.item.id));
 			list = list.filter((c) => ids.has(c.id));
@@ -65,7 +68,11 @@ export function useDevotionalSearch(
 			);
 		}
 		return list;
-	}, [sortedCheckIns, titleQuery, contentQuery, fuseTitle]);
+	}, [sortedCheckIns, deferredTitleQuery, deferredContentQuery, fuseTitle]);
+
+	const isPending =
+		deferredTitleQuery !== titleQuery ||
+		deferredContentQuery !== contentQuery;
 
 	const orderLabel =
 		dateSortOrder === "asc"
@@ -77,10 +84,13 @@ export function useDevotionalSearch(
 		setTitleQuery,
 		contentQuery,
 		setContentQuery,
+		deferredTitleQuery,
+		deferredContentQuery,
 		dateSortOrder,
 		setDateSortOrder,
 		sortedCheckIns,
 		filtered,
+		isPending,
 		orderLabel,
 	};
 }
