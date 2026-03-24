@@ -1,8 +1,8 @@
+import { Loader2 } from "lucide-react";
 import { DevotionalCard } from "@/components/devotional-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { useProgressiveList } from "@/hooks/use-progressive-list";
 import type { CheckIn } from "@/types/devotional";
-import { Loader2 } from "lucide-react";
 
 type DevotionalListProps = {
 	checkIns: CheckIn[];

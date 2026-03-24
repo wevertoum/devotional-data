@@ -16,9 +16,7 @@ export function useProgressiveList<T>(items: T[], batchSize = 20) {
 		const observer = new IntersectionObserver(
 			([entry]) => {
 				if (entry.isIntersecting) {
-					setVisibleCount((prev) =>
-						Math.min(prev + batchSize, items.length),
-					);
+					setVisibleCount((prev) => Math.min(prev + batchSize, items.length));
 				}
 			},
 			{ rootMargin: "400px" },

@@ -63,16 +63,13 @@ export function useDevotionalSearch(
 			list = list.filter((c) => ids.has(c.id));
 		}
 		if (cq) {
-			list = list.filter((c) =>
-				contentMatchesQuery(c.description ?? "", cq),
-			);
+			list = list.filter((c) => contentMatchesQuery(c.description ?? "", cq));
 		}
 		return list;
 	}, [sortedCheckIns, deferredTitleQuery, deferredContentQuery, fuseTitle]);
 
 	const isPending =
-		deferredTitleQuery !== titleQuery ||
-		deferredContentQuery !== contentQuery;
+		deferredTitleQuery !== titleQuery || deferredContentQuery !== contentQuery;
 
 	const orderLabel =
 		dateSortOrder === "asc"
