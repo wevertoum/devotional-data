@@ -9,6 +9,12 @@ import type {
 	DateSortOrder,
 } from "@/types/devotional";
 
+function contentMatchesQuery(description: string, query: string): boolean {
+	const normalized = normalizeSearchText(description);
+	const words = query.split(/\s+/).filter(Boolean);
+	return words.every((word) => normalized.includes(word));
+}
+
 export function useDevotionalSearch(
 	checkIns: CheckIn[],
 	rules: CheckInFilterRule[] = [],
@@ -38,24 +44,9 @@ export function useDevotionalSearch(
 						getFn: (item: CheckIn) => normalizeSearchText(item.title),
 					},
 				],
-				threshold: 0.35,
+				threshold: 0.2,
 				ignoreLocation: true,
-			}),
-		[sortedCheckIns],
-	);
-
-	const fuseContent = useMemo(
-		() =>
-			new Fuse(sortedCheckIns, {
-				keys: [
-					{
-						name: "description",
-						getFn: (item: CheckIn) =>
-							normalizeSearchText(item.description ?? ""),
-					},
-				],
-				threshold: 0.45,
-				ignoreLocation: true,
+				minMatchCharLength: 2,
 			}),
 		[sortedCheckIns],
 	);
@@ -69,11 +60,12 @@ export function useDevotionalSearch(
 			list = list.filter((c) => ids.has(c.id));
 		}
 		if (cq) {
-			const ids = new Set(fuseContent.search(cq).map((r) => r.item.id));
-			list = list.filter((c) => ids.has(c.id));
+			list = list.filter((c) =>
+				contentMatchesQuery(c.description ?? "", cq),
+			);
 		}
 		return list;
-	}, [sortedCheckIns, titleQuery, contentQuery, fuseTitle, fuseContent]);
+	}, [sortedCheckIns, titleQuery, contentQuery, fuseTitle]);
 
 	const orderLabel =
 		dateSortOrder === "asc"
